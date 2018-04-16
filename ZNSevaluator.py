@@ -18,8 +18,8 @@ def standardDevThread(key_pos, value_pos, H, T, query_no):
             dev = math.sqrt(key_val_cnt.map(lambda x: (x[1] - averg)**2).reduce(lambda x, y: x+y)/total_cnt)
             print "dev:", dev
             if dev:
-                devFromAverg = key_val_cnt.map(lambda x: (x[0], abs(x[1] - averg)/dev))
-                devH = devFromAverg.filter(lambda x: x[1] > H)
+                devFromAverg = key_val_cnt.map(lambda x: (x[0], x[1], abs(x[1] - averg)/dev))
+                devH = devFromAverg.filter(lambda x: x[2] > H)
                 print "devH:", devH.collect()
     sc = SparkContext("local[2]", "zns")
     ssc = StreamingContext(sc, 1)
@@ -39,7 +39,7 @@ def bandWidthThread(key_pos, value_pos, X, T, query_no):
         if key_val_cnt.count():
             total_cnt = key_val_cnt.count()
             total_val = key_val_cnt.map(lambda x: x[1]).reduce(lambda x, y: x+y)
-            moreThanX = key_val_cnt.map(lambda x: (x[0], x[1]/total_val)).filter(lambda x: x[1] > X)
+            moreThanX = key_val_cnt.map(lambda x: (x[0], x[1], x[1]/total_val)).filter(lambda x: x[2] > X)
             print "bandH:", moreThanX.collect()
     sc = SparkContext("local[2]", "zns")
     ssc = StreamingContext(sc, 1)
@@ -72,7 +72,7 @@ def topKThread(key_pos, value_pos, K, T, query_no):
     ssc.awaitTermination()
 
 try:
-    thread.start_new_thread(topKThread, (2, 5, 3, 6, 1))
+    thread.start_new_thread(standardDevThread, (2, 5, 1, 6, 1))
 except:
    print "Error: unable to start thread"
 

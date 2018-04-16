@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta charset="UTF-8">
+  <title>ZNS</title>
+
+</head>
+
+<body>
+
+  <body>
+<h1>ZNS</h1><br>
+  <h3>Input configuration:</h3>
+<form method="POST">
+ Protocols:<br>
+<input type="text" name="pro"><br>
+ Protocols fraction:<br>
+<input type="text" name="proFrac"><br>
+ IPs:<br>
+<input type="text" name="ips"><br>
+ IPs fraction:<br>
+<input type="text" name="ipFrac"><br>
+ Protocols:<br>
+<input type="text" name="Bandwidth"><br>
+<input type="submit" value="input_submit" name="action"><br>
+<h3>Query Configuration</h3>
+<input type="radio" name="query_type" value="IP"> IP<br>
+<input type="radio" name="query_type" value="Protocol"> Protocol<br>
+Query detail:<br>
+Top-K:<br>
+<input type="text" name="topK"><br>
+DevX/times:<br>
+<input type="text" name="devx"><br>
+BandwidthH/%:<br>
+<input type="text" name="bandh"><br>
+  Time Unit/sec:
+<input type="text" name="time_unit"><br>
+<button type="submit" value="query_submit" name="action" onclick="appr()">Submit Query </button>
+<br>
+<h3> Queues:</h3>
+<select name="exist_queries">
+    <option value="-1" SELECTED> CHOOSE </option>
+    {% for o in option_list.values() %}
+        <option value="{{ o.optid }}">{{ o.value }}</option>
+    {% endfor %}
+</select>
+<input type="submit" value="cancel_submit" name="action" ><br>
+</form>
+<script type="text/javascript">
+    function appr(){
+        alert('You add a new query!');
+    }
+</script>
+</body>
+</body>
+
+</html>
