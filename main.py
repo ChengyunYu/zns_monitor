@@ -4,18 +4,15 @@ import random
 from ZNS import ZNSevaluator
 
 app = Flask(__name__)
-ZNSevaluator.init_queries()
-
 def geneQid():
     while 1:
         qid = random.randint(1, 1000)
-        if not ZNSevaluator.in_queries(qid):
+        if not ZNSevaluator.queries.in_queries(qid):
             return qid
 
 @app.route('/')
 def my_form():
-    ZNSevaluator.init_queries();
-    return render_template('index.html', option_list=ZNSevaluator.queries)
+    return render_template('index.html', option_list=ZNSevaluator.queries.values())
 
 @app.route('/', methods=['POST'])
 def my_form_post():
@@ -44,14 +41,14 @@ def my_form_post():
                     new_que.type = 'bandh'
                     option_content += request.form['bandh']+r'% of Bandwith'
             new_que.value = option_content
-            ZNSevaluator.add_query(new_que.optid, new_que)
+            ZNSevaluator.queries.add_query(new_que.optid, new_que)
             ZNSevaluator.parseQuery(new_que)
         else:
             print "here"
             if 'exist_queries' in request.form:
                 del_qid = int(request.form['exist_queries'])
                 print "del_qid:", del_qid
-                if ZNSevaluator.in_queries(del_qid):
-                    ZNSevaluator.delete_query(del_qid)
-    return render_template('index.html', option_list=ZNSevaluator.queries)
+                if ZNSevaluator.queries.in_queries(del_qid):
+                    ZNSevaluator.queries.delete_query(del_qid)
+    return render_template('index.html', option_list=ZNSevaluator.queries.values())
 

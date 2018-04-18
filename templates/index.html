@@ -41,7 +41,7 @@ BandwidthH/%:<br>
 <h3> Queues:</h3>
 <select name="exist_queries">
     <option value="-1" SELECTED> CHOOSE </option>
-    {% for o in option_list.values() %}
+    {% for o in option_list %}
         <option value="{{ o.optid }}">{{ o.value }}</option>
     {% endfor %}
 </select>
