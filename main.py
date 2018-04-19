@@ -44,10 +44,10 @@ def my_form_post():
             option_content = "Query for "+request.form['query_type'] + " for each "+request.form['time_unit']+" sec: "
             new_que.content_type = request.form['query_type']
             new_que.T = request.form['time_unit']
-            if request.form['topK']:
-                new_que.num =  request.form['topK']
-                new_que.query_type = 'topK'
-                option_content += 'top-' +  request.form['topK']
+            if request.form['topk']:
+                new_que.num =  request.form['topk']
+                new_que.query_type = 'topk'
+                option_content += 'top-' +  request.form['topk']
             else:
                 if request.form['devx']:
                     new_que.num =  request.form['devx']
