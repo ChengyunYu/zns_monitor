@@ -19,6 +19,33 @@ class query(object):
         self.T = 0
         self.proc = None
 
+class queRes(object):
+    que_res = None
+
+    def __init__(self):
+        type(self).que_res = multiprocessing.Queue()
+
+    def addRes(self, query_type, k_v):
+        new_res = {'type':query_type, 'data' : []}
+        if not k_v:
+            return
+        if len(k_v[0]) == 2:
+            for (k, v) in k_v:
+                new_res['data'].append({'name':k, 'num':v})
+        else:
+            for (k, v, dummy) in k_v:
+                new_res['data'].append({'name':k, 'num':v})
+        type(self).que_res.put(new_res)
+        print("addRes:", new_res)
+
+    def getRes(self):
+        ret = []
+        while not type(self).que_res.empty():
+            ret.append(type(self).que_res.get())
+        return ret
+
+
+
 
 class ques(object):
     my_queries = {}
@@ -49,8 +76,9 @@ class ques(object):
         return type(self).my_queries.values()
 
 queries = ques()
+chart_res = queRes()
 
-def newProcess(key_pos, value_pos, num, T, query_no, query_type):
+def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
     def standDevX(data):
         print ("in: ", query_no)
         key_val_cnt = data.filter(lambda x: x[1] > 0)
@@ -66,7 +94,10 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type):
             if dev:
                 devFromAverg = key_val_cnt.map(lambda x: (x[0], x[1], abs(x[1] - averg)/dev))
                 devH = devFromAverg.filter(lambda x: x[2] > num)
-                print("devH:", devH.collect())
+                devH_res = devH.collect()
+                print('devH_res:', devH_res)
+                chart_res_que.addRes(query_type, devH_res)
+
 
     def bandH(data):
         print ("in: ", query_no)
@@ -75,7 +106,9 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type):
             total_cnt = key_val_cnt.count()
             total_val = key_val_cnt.map(lambda x: x[1]).reduce(lambda x, y: x+y)
             moreThanX = key_val_cnt.map(lambda x: (x[0], x[1], x[1]/total_val)).filter(lambda x: x[2] > num)
-            print("bandH:", moreThanX.collect())
+            bandH_res = moreThanX.collect()
+            print("bandH:", bandH_res)
+            chart_res_que.addRes(query_type, bandH_res)
 
     def topK(data):
         print ("in: ", query_no)
@@ -83,13 +116,15 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type):
         if key_val_cnt.count():
             topk = key_val_cnt.top(num, key=lambda x: x[1])
             print("topk:", topk)
+            chart_res_que.addRes(query_type, topk)
+
 
     conf = SparkConf().setAppName("zns").setMaster("local")
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
     ssc = StreamingContext(sc, 1)
-    data = ssc.textFileStream(r"file:///Users/matthew/Documents/Data-Streaming/zns-master/data/")
-    ssc.checkpoint(r"file:////Users/matthew/Documents/Data-Streaming/zns-master/data/checkpoint%d"%query_no)
+    data = ssc.textFileStream(r"file:///Users/ChenNeng/Desktop/2018_Spring/Large_Data_Stream/project/data")
+    ssc.checkpoint(r"file:///Users/ChenNeng/Desktop/2018_Spring/Large_Data_Stream/project/checkpoint%d"%query_no)
     words = data.map(lambda line: line.split(' ')).map(lambda record:
         (record[key_pos], float(record[value_pos])))
     processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
@@ -115,13 +150,7 @@ def parseQuery(new_queue):
         if new_queue.content_type == 'Protocol':
             key_pos = 4
     value_pos = 5
-    new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, int(new_queue.num), int(new_queue.T), new_queue.optid, new_queue.query_type))
+    new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, int(new_queue.num), int(new_queue.T), new_queue.optid, new_queue.query_type, chart_res))
     queries.add_proc(new_queue.optid, new_proc)
     new_proc.start()
-
-
-
-
-
-
 

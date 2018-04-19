@@ -12,17 +12,19 @@ def geneQid():
         if not ZNSevaluator.queries.in_queries(qid):
             return qid
 
-def Response_headers(content):  
-    resp = Response(content)  
-    resp.headers['Access-Control-Allow-Origin'] = '*'  
-    return resp 
+def Response_headers(content):
+    resp = Response(content)
+    resp.headers['Access-Control-Allow-Origin'] = '*'
+    return resp
 
 @app.route('/echarts-1')
 def echarts_1_post():
-    print ZNSevaluator.queries.values()
-    content = json.dumps(ZNSevaluator.queries.values())  
-    resp = Response_headers(content)  
-    return resp 
+    print('in echarts-1')
+    ctrs =  ZNSevaluator.chart_res.getRes()
+    print ctrs
+    content = json.dumps(ctrs)
+    resp = Response_headers(content)
+    return resp
 
 
 @app.route('/')
