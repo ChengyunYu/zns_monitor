@@ -88,8 +88,8 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type):
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
     ssc = StreamingContext(sc, 1)
-    data = ssc.textFileStream(r"file:///Users/ChenNeng/Desktop/2018_Spring/Large_Data_Stream/project/data")
-    ssc.checkpoint(r"file:///Users/ChenNeng/Desktop/2018_Spring/Large_Data_Stream/project/checkpoint%d"%query_no)
+    data = ssc.textFileStream(r"file:///Users/matthew/Documents/Data-Streaming/zns-master/data/")
+    ssc.checkpoint(r"file:////Users/matthew/Documents/Data-Streaming/zns-master/data/checkpoint%d"%query_no)
     words = data.map(lambda line: line.split(' ')).map(lambda record:
         (record[key_pos], float(record[value_pos])))
     processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \

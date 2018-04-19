@@ -17,9 +17,9 @@ except socket.error , msg:
     print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
     sys.exit()
 print 'Socket bind complete'
-s.listen(10)
+# s.listen(10)
 print 'Socket now listening'
-conn, addr = s.accept()
+# conn, addr = s.accept()
 import numpy as np
 versions = ['ipv4', 'ipv6']
 protocols = ['HTTP', 'SMTP', 'TCP', 'UDP', 'SNMP', 'FTP', 'BGP', 'BGP', 'DHCP', 'SSH']
@@ -33,5 +33,7 @@ while 1:
     protocol = np.random.choice(protocols, p = pfracs)
     sour, dest = np.random.choice(ips, 2, p = ifracs)
     size = np.random.random_sample()
-    conn.send(str(idx) + ' ' + version + ' ' + sour + ' ' + dest + ' ' + protocol + ' ' + str(size) + '\n')
+    with open('/Users/matthew/Documents/Data-Streaming/zns-master/data/data-3.txt', 'a') as f:
+    	f.write(str(idx) + ' ' + version + ' ' + sour + ' ' + dest + ' ' + protocol + ' ' + str(size) + '\n')
+    # conn.send(str(idx) + ' ' + version + ' ' + sour + ' ' + dest + ' ' + protocol + ' ' + str(size) + '\n')
     idx = idx + 1

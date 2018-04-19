@@ -1,14 +1,29 @@
 from flask import Flask, flash, redirect, render_template, \
-     request, url_for
+     request, url_for, Response
 import random
+import json
 from ZNS import ZNSevaluator
 
 app = Flask(__name__)
+
 def geneQid():
     while 1:
         qid = random.randint(1, 1000)
         if not ZNSevaluator.queries.in_queries(qid):
             return qid
+
+def Response_headers(content):  
+    resp = Response(content)  
+    resp.headers['Access-Control-Allow-Origin'] = '*'  
+    return resp 
+
+@app.route('/echarts-1')
+def echarts_1_post():
+    print ZNSevaluator.queries.values()
+    content = json.dumps(ZNSevaluator.queries.values())  
+    resp = Response_headers(content)  
+    return resp 
+
 
 @app.route('/')
 def my_form():
@@ -52,3 +67,5 @@ def my_form_post():
                     ZNSevaluator.queries.delete_query(del_qid)
     return render_template('index.html', option_list=ZNSevaluator.queries.values())
 
+if __name__ == '__main__':
+    app.run(debug=True)
