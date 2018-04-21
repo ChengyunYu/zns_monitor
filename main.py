@@ -6,11 +6,7 @@ from ZNS import ZNSevaluator
 
 app = Flask(__name__)
 
-def geneQid():
-    while 1:
-        qid = random.randint(1, 1000)
-        if not ZNSevaluator.queries.in_queries(qid):
-            return qid
+
 
 def Response_headers(content):
     resp = Response(content)
@@ -35,12 +31,20 @@ def my_form():
 def my_form_post():
     print(request.form['action'])
     if request.form['action'] == 'input_submit':
-        print (request.form['pro'])
+        new_data_str = ZNSevaluator.inputStr()
+        if request.form['ips']:
+            new_data_str.ips = request.form['ips']
+            new_data_str.ip_frac = request.form['ip_frac']
+        if request.form['pro']:
+            new_data_str.pro = request.form['pro']
+            new_data_str.pro_frac = request.form['pro_frac']
+        if request.form['bandwidth']:
+            new_data_str.bandwidth = request.form['bandwidth']
+        new_data_str.data_clean()
+        new_data_str.print_out()
     else:
         if request.form['action'] == 'query_submit':
             new_que = ZNSevaluator.query()
-            new_que.optid = geneQid()
-
             option_content = "Query for "+request.form['query_type'] + " for each "+request.form['time_unit']+" sec: "
             new_que.content_type = request.form['query_type']
             new_que.T = request.form['time_unit']
@@ -58,7 +62,7 @@ def my_form_post():
                     new_que.type = 'bandh'
                     option_content += request.form['bandh']+r'% of Bandwith'
             new_que.value = option_content
-            ZNSevaluator.queries.add_query(new_que.optid, new_que)
+            ZNSevaluator.queries.add_query(new_que)
             ZNSevaluator.parseQuery(new_que)
         else:
             print "here"
@@ -67,6 +71,7 @@ def my_form_post():
                 print "del_qid:", del_qid
                 if ZNSevaluator.queries.in_queries(del_qid):
                     ZNSevaluator.queries.delete_query(del_qid)
+    print 7
     return render_template('index.html', option_list=ZNSevaluator.queries.values())
 
 if __name__ == '__main__':

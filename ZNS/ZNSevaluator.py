@@ -19,6 +19,7 @@ class query(object):
         self.T = 0
         self.proc = None
 
+
 class queRes(object):
     que_res = None
 
@@ -52,9 +53,7 @@ class ques(object):
     def __init__(self):
         type(self).my_queries = {}
 
-    def add_query(self, idx, new_query):
-        print "add idx:", idx
-        type(self).my_queries[idx] = new_query
+
 
     def delete_query(self, idx):
         print "delete_query:", idx
@@ -75,8 +74,55 @@ class ques(object):
     def values(self):
         return type(self).my_queries.values()
 
+    def geneQid(self):
+        while 1:
+            qid = random.randint(1, 1000)
+            if not self.in_queries(qid):
+                return qid
+
+    def add_query(self, new_query):
+        qid = self.geneQid()
+        print "add idx:", qid
+        type(self).my_queries[qid] = new_query
+
+class inputStr(object):
+    def __init__(self):
+        self.ips = ''
+        self.ip_frac = ''
+        self.pro = ''
+        self.pro_frac = ''
+        self.bandwidth = ''
+
+    def data_clean(self):
+        def split_line(line):
+            return map(float, line.split())
+        if(self.ip_frac):
+            self.ip_frac = split_line(self.ip_frac)
+        if(self.pro_frac):
+            self.pro_frac = split_line(self.pro_frac)
+        if self.bandwidth:
+            self.bandwidth = float(self.bandwidth)
+
+    def print_out(self):
+        print("Input str:")
+        print(self.ips)
+        print(self.ip_frac)
+        print(self.pro)
+        print(self.pro_frac)
+        print(self.bandwidth)
+
+class dataStr(object):
+    my_input_str = {}
+    def __init__(self):
+        type(self).my_input_str = {}
+
+    def add_input_str(self, idx, new_input):
+        print "add input idx:", idx
+        type(self).my_input_str[idx] = new_input
+
 queries = ques()
 chart_res = queRes()
+data_str = dataStr()
 
 def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
     def standDevX(data):
