@@ -3,6 +3,7 @@ from flask import Flask, flash, redirect, render_template, \
 import random
 import json
 from ZNS import ZNSevaluator
+import DataSource
 
 app = Flask(__name__)
 
@@ -17,7 +18,7 @@ def Response_headers(content):
 def echarts_1_post():
     print('in echarts-1')
     ctrs =  ZNSevaluator.chart_res.getRes()
-    print ctrs
+    print(ctrs)
     content = json.dumps(ctrs)
     resp = Response_headers(content)
     return resp
@@ -45,6 +46,7 @@ def my_form_post():
             new_data_str.bandwidth = request.form['bandwidth']
 
         new_data_str.data_clean()
+        DataSource.generateData(new_data_str)
         new_data_str.print_out()
     else:
         if request.form['action'] == 'query_submit':
@@ -69,10 +71,10 @@ def my_form_post():
             ZNSevaluator.queries.add_query(new_que)
             ZNSevaluator.parseQuery(new_que)
         else:
-            print "here"
+            print("here")
             if 'exist_queries' in request.form:
                 del_qid = int(request.form['exist_queries'])
-                print "del_qid:", del_qid
+                print("del_qid:", del_qid)
                 if ZNSevaluator.queries.in_queries(del_qid):
                     ZNSevaluator.queries.delete_query(del_qid)
     return render_template('index.html', option_list=ZNSevaluator.queries.values())
