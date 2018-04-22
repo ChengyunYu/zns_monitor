@@ -189,23 +189,18 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
     ssc = StreamingContext(sc, 1)
     data = ssc.textFileStream(r"./Data")
     ssc.checkpoint(r"../checkpoint%d"%query_no)
-    data.pprint()
-    ssc.start()
-    ssc.awaitTermination()
-
-    # words = data.map(lambda line: line.split(' ')).map(lambda record:
-    #     (record[key_pos], float(record[value_pos])))
-    # processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
-    #     lambda x, y: x-y, T, 1)
-    # processed_words.pprint()
-    # if(query_type == 'devx'):
-    #     processed_words.foreachRDD(standDevX)
-    # else:
-    #     if(query_type == 'bandh'):
-    #         processed_words.foreachRDD(bandH)
-    #     else:
-    #         processed_words.foreachRDD(topK)
-
+    words = data.map(lambda line: line.split(' ')).map(lambda record:
+        (record[key_pos], float(record[value_pos])))
+    processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
+        lambda x, y: x-y, T, 1)
+    processed_words.pprint()
+    if(query_type == 'devx'):
+        processed_words.foreachRDD(standDevX)
+    else:
+        if(query_type == 'bandh'):
+            processed_words.foreachRDD(bandH)
+        else:
+            processed_words.foreachRDD(topK)
     ssc.start()
     ssc.awaitTermination()
 
