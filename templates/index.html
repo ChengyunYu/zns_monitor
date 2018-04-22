@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>ZNS</title>
+  <link  rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
   <script type="text/javascript" src="http://echarts.baidu.com/dist/echarts.js"></script>
   <script type="text/javascript" src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js"></script>
 </head>
@@ -12,7 +13,6 @@
 
 <body>
   <div style="float:left; width: 20%;">
-    <h1>ZNS</h1><br>
     <h3>Input configuration:</h3>
     <form method="POST">
         Protocols:<br><input type="text" name="pro"><br> Protocols fraction:<br><input type="text" name="pro_frac"><br>
@@ -21,7 +21,7 @@
         Packet size:<br><input type="text" name="pack_size"><br>
         Packet_size fraction:<br><input type="text" name="pack_size_frac"><br>
         Bandwidth:<br><input type="text" name="bandwidth"><br>
-        <input type="submit" value="input_submit" name="action"><br>
+        <button class='button' type="submit" value="input_submit" name="action" onclick="appr_input()">Submit Input </button> <br>
         <h3>Query Configuration</h3>
         <input type="radio" name="query_type" value="IP"> IP<br>
         <input type="radio" name="query_type" value="Protocol"> Protocol<br> Query detail:<br> Top-K:
@@ -30,9 +30,9 @@
         <br>
         <input type="text" name="devx"><br> BandwidthH/%:
         <br>
-        <input type="text" name="bandh"><br> Time Unit/sec:
+        <input type="text" name="bandh"><br> Time Unit/sec:<br>
         <input type="text" name="time_unit"><br>
-        <button type="submit" value="query_submit" name="action" onclick="appr()">Submit Query </button>
+        <button class='button' type="submit" value="query_submit" name="action" onclick="appr()">Submit Query </button>
         <br>
         <h3> Queries:</h3>
         <select name="exist_queries">
@@ -41,7 +41,7 @@
           <option value="{{ o.optid }}">{{ o.value }}</option>
           {% endfor %}
         </select>
-        <input type="submit" value="cancel_submit" name="action"><br>
+        <button class='button' type="submit" value="cancel_submit" name="action" onclick="appr_cancel()">Cancel Query </button><br>
     </form>
   </div>
   <div style="float: left; width: 75%;" id="charts_div" >
@@ -62,6 +62,12 @@
 <script type="text/javascript">
   function appr(){
       alert('You add a new query!');
+  }
+  function appr_cancel(){
+      alert('You appr_cancel a query!');
+  }
+  function appr_input(){
+      alert('You add a new input stream!');
   }
 </script>
 
