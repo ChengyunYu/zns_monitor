@@ -5,14 +5,29 @@ from ZNS import ZNSevaluator
 
 def generateData(inputStr): 
     versions = ["ipv4", "ipv6"]
-    protocols = inputStr.pro
-    sizes = inputStr.pack_size
-    ips = inputStr.ips
     vfracs = [0.5, 0.5]
-    pfracs = inputStr.pro_frac
-    ifracs = inputStr.ip_frac
-    sfracs = inputStr.pack_size_frac
-    bandwidth = inputStr.bandwidth
+    if inputStr.pro: 
+        protocols = inputStr.pro
+        pfracs = inputStr.pro_frac
+    else: 
+        protocols = ['HTTP', 'SMTP', 'TCP', 'UDP', 'SNMP', 'FTP', 'BGP', 'BGP', 'DHCP', 'SSH']
+        pfracs = [0.05, 0, 0.45, 0.2, 0.1, 0.2, 0, 0, 0, 0]
+    if inputStr.pack_size: 
+        sizes = inputStr.pack_size
+        sfracs = inputStr.pack_size_frac
+    else: 
+        sizes = [100, 200]
+        sfracs = [0.7, 0.3]
+    if inputStr.ips: 
+        ips = inputStr.ips
+        ifracs = inputStr.ip_frac
+    else: 
+        ips = ['172.16.254.1', '255.255.255.128', '192.168.0.0', '172.16.0.0', '172.16.254.1', '255.255.128.0', '216.3.128.12', '24.60.91.16', '1.40.215.65', '23.129.64.104']
+        ifracs = [0.1, 0.3, 0.05, 0.05, 0.1, 0.1, 0.04, 0.06, 0.1, 0.1]
+    if inputStr.bandwidth: 
+        bandwidth = inputStr.bandwidth
+    else: 
+        bandwidth = 2
     idx = 1
     totalsize = 0
     f = open("./Data/Packets" + str(int(time.time())), "w")
@@ -24,6 +39,7 @@ def generateData(inputStr):
         protocol = np.random.choice(protocols, p = pfracs)
         sour, dest = np.random.choice(ips, 2, p = ifracs)
         pick = np.random.uniform(0.0, 1.0)
+        size = 0
         for i in range(1, len(sizes)): 
             if pick >= border: 
                 if pick < border + sfracs[i]: 
