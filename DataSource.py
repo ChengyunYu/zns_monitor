@@ -3,6 +3,7 @@ import numpy as np
 import time
 from ZNS import ZNSevaluator
 import multiprocessing
+import shutil
 
 def generateData(inputStr): 
     versions = ["ipv4", "ipv6"]
@@ -28,10 +29,11 @@ def generateData(inputStr):
     if inputStr.bandwidth: 
         bandwidth = inputStr.bandwidth
     else: 
-        bandwidth = 2
+        bandwidth = 0.5
     idx = 1
     totalsize = 0
-    f = open("./Data/Packets" + str(int(time.time())), "w")
+    temp = str(int(time.time()))
+    f = open("./Temp/Packets" + temp, "w")
     f1 = open("./Log/Logs", "w")
     start = time.time()
     while 1: 
@@ -42,7 +44,7 @@ def generateData(inputStr):
         sour, dest = np.random.choice(ips, 2, p = ifracs)
         pick = np.random.uniform(0.0, 1.0)
         size = 0
-        for i in range(1, len(sizes)): 
+        for i in range(len(sizes)): 
             if pick >= border: 
                 if pick < border + sfracs[i]: 
                     size = np.random.uniform(sborder, sborder + sizes[i])
@@ -57,7 +59,9 @@ def generateData(inputStr):
                         str(elapsed) + " seconds, flow rate is: " + str(totalsize / elapsed / 1024) + " MB/s. ")
                     totalsize = 0
                     f.close()
-                    f = open("./Data/Packets" + str(int(time.time())), "w")
+                    shutil.move("./Temp/Packets" + temp, "./Data/Packets" + temp)
+                    temp = str(int(time.time()))
+                    f = open("./Temp/Packets" + temp, "w")
                     start = time.time()
                     break
         totalsize += size
