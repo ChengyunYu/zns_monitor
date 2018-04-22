@@ -46,8 +46,7 @@ def my_form_post():
             new_data_str.bandwidth = request.form['bandwidth']
 
         new_data_str.data_clean()
-        DataSource.generateData(new_data_str)
-        new_data_str.print_out()
+        DataSource.newGen(new_data_str)
     else:
         if request.form['action'] == 'query_submit':
             new_que = ZNSevaluator.query()
