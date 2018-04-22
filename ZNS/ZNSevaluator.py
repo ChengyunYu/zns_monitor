@@ -88,6 +88,7 @@ class ques(object):
 
 class inputStr(object):
     def __init__(self):
+        self.idx = 0
         self.ips = ''
         self.ip_frac = ''
         self.pro = ''
@@ -126,9 +127,18 @@ class dataStr(object):
     def __init__(self):
         type(self).my_input_str = {}
 
-    def add_input_str(self, idx, new_input):
+    def geneQid(self):
+        while 1:
+            qid = random.randint(1, 1000)
+            if not self.my_input_str(qid):
+                return qid
+
+    def add_input_str(self, new_input):
+        idx = self.geneQid()
         print("add input idx:", idx)
         type(self).my_input_str[idx] = new_input
+        new_query.idx = idx
+
 
 queries = ques()
 chart_res = queRes()
