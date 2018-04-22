@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import time
 from ZNS import ZNSevaluator
+import multiprocessing
 
 def generateData(inputStr): 
     versions = ["ipv4", "ipv6"]
@@ -31,6 +32,7 @@ def generateData(inputStr):
     idx = 1
     totalsize = 0
     f = open("./Data/Packets" + str(int(time.time())), "w")
+    f1 = open("./Log/Logs", "w")
     start = time.time()
     while 1: 
         border = 0.0
@@ -51,8 +53,8 @@ def generateData(inputStr):
                 end = time.time()
                 elapsed = end - start
                 if elapsed > 1: 
-                    print(str(totalsize) + " KB(s) of packets passed through in " + 
-                        str(elapsed) + "seconds, flow rate is: " + str(totalsize / elapsed / 1024) + " MB/s. ")
+                    f1.write(str(totalsize) + " KB(s) of packets passed through in " + 
+                        str(elapsed) + " seconds, flow rate is: " + str(totalsize / elapsed / 1024) + " MB/s. ")
                     totalsize = 0
                     f.close()
                     f = open("./Data/Packets" + str(int(time.time())), "w")
@@ -61,3 +63,7 @@ def generateData(inputStr):
         totalsize += size
         f.write(str(idx) + ' ' + version + ' ' + sour + ' ' + dest + ' ' + protocol + ' ' + str(size) + '\n')
         idx = idx + 1
+
+def newGen(inputStr): 
+    newProc = multiprocessing.Process(target = generateData, args = (inputStr, ))
+    newProc.start()
