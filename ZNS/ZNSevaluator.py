@@ -2,9 +2,10 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 import threading, os, sys
 import math
-import thread
+import _thread
 import time, random
 import multiprocessing, signal
+import numpy as np
 
 
 
@@ -55,7 +56,7 @@ class ques(object):
 
 
     def delete_query(self, idx):
-        print "delete_query:", idx
+        print("delete_query:", idx)
         type(self).my_queries[idx].proc.terminate()
         type(self).my_queries.pop(idx)
 
@@ -66,7 +67,7 @@ class ques(object):
 
     def add_proc(self, idx, p):
         if not self.in_queries(idx):
-            print "error idx for pid"
+            print("error idx for pid")
         else:
             type(self).my_queries[idx].proc = p
 
@@ -81,7 +82,7 @@ class ques(object):
 
     def add_query(self, new_query):
         qid = self.geneQid()
-        print "add idx:", qid
+        print("add idx:", qid)
         type(self).my_queries[qid] = new_query
         new_query.optid = qid
 
@@ -97,7 +98,7 @@ class inputStr(object):
 
     def data_clean(self):
         def split_line(line):
-            return map(float, line.split())
+            return np.array(line.split(), float)
         if(self.ip_frac):
             self.ip_frac = split_line(self.ip_frac)
             self.ips = self.ips.split()
@@ -126,7 +127,7 @@ class dataStr(object):
         type(self).my_input_str = {}
 
     def add_input_str(self, idx, new_input):
-        print "add input idx:", idx
+        print("add input idx:", idx)
         type(self).my_input_str[idx] = new_input
 
 queries = ques()
@@ -173,7 +174,7 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
             print("topk:", topk)
             chart_res_que.addRes(query_type, topk)
 
-    print "T in spark :",T
+    print("T in spark :",T)
     conf = SparkConf().setAppName("zns").setMaster("local")
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
@@ -207,4 +208,3 @@ def parseQuery(new_queue):
     new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, int(new_queue.num), int(new_queue.T), new_queue.optid, new_queue.query_type, chart_res))
     queries.add_proc(new_queue.optid, new_proc)
     new_proc.start()
-
