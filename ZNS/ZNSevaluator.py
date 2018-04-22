@@ -22,10 +22,8 @@ class query(object):
 
 
 class queRes(object):
-    que_res = None
-
     def __init__(self):
-        type(self).que_res = multiprocessing.Queue()
+        self.que_res = multiprocessing.Queue()
 
     def addRes(self, query_type, k_v):
         new_res = {'type':query_type, 'data' : []}
@@ -37,13 +35,13 @@ class queRes(object):
         else:
             for (k, v, dummy) in k_v:
                 new_res['data'].append({'name':k, 'num':v})
-        type(self).que_res.put(new_res)
+        self.que_res.put(new_res)
         print("addRes:", new_res)
 
     def getRes(self):
         ret = []
-        while not type(self).que_res.empty():
-            ret.append(type(self).que_res.get())
+        while not self.que_res.empty():
+            ret.append(self.que_res.get())
         return ret
 
 
@@ -184,24 +182,29 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
             print("topk:", topk)
             chart_res_que.addRes(send_query_type[0], topk)
     send_query_type =[query_type]
+
     conf = SparkConf().setAppName("zns").setMaster("local")
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
     ssc = StreamingContext(sc, 1)
-    data = ssc.textFileStream(r"../data")
+    data = ssc.textFileStream(r"./Data")
     ssc.checkpoint(r"../checkpoint%d"%query_no)
-    words = data.map(lambda line: line.split(' ')).map(lambda record:
-        (record[key_pos], float(record[value_pos])))
-    processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
-        lambda x, y: x-y, T, 2)
-    processed_words.pprint()
-    if(query_type == 'devx'):
-        processed_words.foreachRDD(standDevX)
-    else:
-        if(query_type == 'bandh'):
-            processed_words.foreachRDD(bandH)
-        else:
-            processed_words.foreachRDD(topK)
+    data.pprint()
+    ssc.start()
+    ssc.awaitTermination()
+
+    # words = data.map(lambda line: line.split(' ')).map(lambda record:
+    #     (record[key_pos], float(record[value_pos])))
+    # processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
+    #     lambda x, y: x-y, T, 1)
+    # processed_words.pprint()
+    # if(query_type == 'devx'):
+    #     processed_words.foreachRDD(standDevX)
+    # else:
+    #     if(query_type == 'bandh'):
+    #         processed_words.foreachRDD(bandH)
+    #     else:
+    #         processed_words.foreachRDD(topK)
 
     ssc.start()
     ssc.awaitTermination()
