@@ -61,11 +61,11 @@ def my_form_post():
             else:
                 if request.form['devx']:
                     new_que.num =  request.form['devx']
-                    new_que.type = 'devx'
+                    new_que.query_type = 'devx'
                     option_content += request.form['devx']+r' times of Standard Dev'
                 else:
                     new_que.num =  request.form['bandh']
-                    new_que.type = 'bandh'
+                    new_que.query_type = 'bandh'
                     option_content += request.form['bandh']+r'% of Bandwith'
             new_que.value = option_content
             ZNSevaluator.queries.add_query(new_que)

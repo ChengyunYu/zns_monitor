@@ -2,7 +2,7 @@ from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 import threading, os, sys
 import math
-import _thread
+import thread
 import time, random
 import multiprocessing, signal
 import numpy as np
@@ -152,7 +152,7 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
                 devH = devFromAverg.filter(lambda x: x[2] > num)
                 devH_res = devH.collect()
                 print('devH_res:', devH_res)
-                chart_res_que.addRes(query_type, devH_res)
+                chart_res_que.addRes(send_query_type[0], devH_res)
 
 
     def bandH(data):
@@ -164,7 +164,7 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
             moreThanX = key_val_cnt.map(lambda x: (x[0], x[1], x[1]/total_val)).filter(lambda x: x[2] > num)
             bandH_res = moreThanX.collect()
             print("bandH:", bandH_res)
-            chart_res_que.addRes(query_type, bandH_res)
+            chart_res_que.addRes(send_query_type[0], bandH_res)
 
     def topK(data):
         print ("in: ", query_no)
@@ -172,15 +172,14 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
         if key_val_cnt.count():
             topk = key_val_cnt.top(num, key=lambda x: x[1])
             print("topk:", topk)
-            chart_res_que.addRes(query_type, topk)
-
-    print("T in spark :",T)
+            chart_res_que.addRes(send_query_type[0], topk)
+    send_query_type =[query_type]
     conf = SparkConf().setAppName("zns").setMaster("local")
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
     ssc = StreamingContext(sc, 1)
-    data = ssc.textFileStream(r"file:///Users/ChenNeng/Desktop/2018_Spring/Large_Data_Stream/project/data")
-    ssc.checkpoint(r"file:///Users/ChenNeng/Desktop/2018_Spring/Large_Data_Stream/project/checkpoint%d"%query_no)
+    data = ssc.textFileStream(r"../data")
+    ssc.checkpoint(r"../checkpoint%d"%query_no)
     words = data.map(lambda line: line.split(' ')).map(lambda record:
         (record[key_pos], float(record[value_pos])))
     processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
@@ -205,6 +204,7 @@ def parseQuery(new_queue):
         if new_queue.content_type == 'Protocol':
             key_pos = 4
     value_pos = 5
+    print "type:", new_queue.query_type
     new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, int(new_queue.num), int(new_queue.T), new_queue.optid, new_queue.query_type, chart_res))
     queries.add_proc(new_queue.optid, new_proc)
     new_proc.start()

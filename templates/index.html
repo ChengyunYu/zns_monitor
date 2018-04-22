@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<link rel="stylesheet" href= "{{url_for('static',filename='css/style.css') }}">
 <head>
   <meta charset="UTF-8">
   <title>ZNS</title>
@@ -12,8 +12,8 @@
 
 <body>
   <div style="float:left; width: 20%;">
-    <h1>ZNS</h1><br>
-    <h3>Input configuration:</h3>
+<!--     <h2 >ZNS</h2>
+ -->    <h3>Input configuration:</h3>
     <form method="POST">
         Protocols:<br><input type="text" name="pro"><br> Protocols fraction:<br><input type="text" name="pro_frac"><br>
         IPs:<br><input type="text" name="ips"><br>
@@ -21,18 +21,20 @@
         Packet size:<br><input type="text" name="pack_size"><br>
         Packet_size fraction:<br><input type="text" name="pack_size_frac"><br>
         Bandwidth:<br><input type="text" name="bandwidth"><br>
-        <input type="submit" value="input_submit" name="action"><br>
+        <button type="submit" class="button" value="input_submit" name="action" onclick="appr_input()"> Submit Input</button><br>
         <h3>Query Configuration</h3>
+        Query Content:<br>
         <input type="radio" name="query_type" value="IP"> IP<br>
-        <input type="radio" name="query_type" value="Protocol"> Protocol<br> Query detail:<br> Top-K:
-        <br>
+        <input type="radio" name="query_type" value="Protocol"> Protocol<br>
+        Query Type:<br>
+        Top-K <br>
         <input type="text" name="topk"><br> DevX/times:
         <br>
         <input type="text" name="devx"><br> BandwidthH/%:
         <br>
         <input type="text" name="bandh"><br> Time Unit/sec:
         <input type="text" name="time_unit"><br>
-        <button type="submit" value="query_submit" name="action" onclick="appr()">Submit Query </button>
+        <button type="submit" class="button" value="query_submit" name="action" onclick="appr()"> Submit Query </button>
         <br>
         <h3> Queries:</h3>
         <select name="exist_queries">
@@ -41,7 +43,7 @@
           <option value="{{ o.optid }}">{{ o.value }}</option>
           {% endfor %}
         </select>
-        <input type="submit" value="cancel_submit" name="action"><br>
+        <button type="submit" class="button" value="cancel_submit" name="action" onclick="appr_cancel()">Cancel Query</button> <br>
     </form>
   </div>
   <div style="float: left; width: 75%;" id="charts_div" >
@@ -63,10 +65,16 @@
   function appr(){
       alert('You add a new query!');
   }
+  function appr_cancel(){
+      alert('You cancel a query!');
+  }
+  function appr_input(){
+      alert('You add a data stream!');
+  }
 </script>
 
-<script type="text/javascript" src="../js/chart-1.js"></script>
-
+<!-- <script type="text/javascript" src="../js/chart-1.js"></script>
+ -->
 
 
 </html>
