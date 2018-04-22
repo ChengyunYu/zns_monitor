@@ -1,0 +1,28 @@
+#znsheader{
+  font-style:italic;
+  font-weight:bold;
+}
+.button {
+  color: purple;
+  border-style: dotted;
+}
+.myinterest {
+  color: lightblue;
+  border-style: dotted;
+}
+div {
+  color: #0a8be3;
+}
+li {
+  color: #008ba3;
+}
+#abc {
+  text-align: center;
+}
+#div1 {
+  border-style:dashed;
+}
+#button1 {
+  background-color: #ffff00;
+  border-style: dashed;
+}
