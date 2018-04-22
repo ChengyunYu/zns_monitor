@@ -73,21 +73,37 @@ var setJson = {
 myChart_1.setOption(setJson);
 myChart_2.setOption(setJson);
 myChart_3.setOption(setJson);
-//myChart_1.showLoading();    
+
+myChart_1.showLoading(); 
+myChart_2.showLoading();
+myChart_3.showLoading();   
+
+var names_topk = [];  
+var nums_topk = []; 
+var names_devx = [];  
+var nums_devx = []; 
+var names_bandh = [];  
+var nums_bandh = []; 
 
 var getting = {
     type: "get",
     url: "http://127.0.0.1:5000/echarts-1",  
     dataType: "json",  
     success: function(result) {
-        if (result['type'] === 'topk') {
-            var names = [];  
-            var nums = [];   
-            for (var i = 0; i < result["data"].length; i++) {
-                names.push(result["data"][i]["name"]); 
+        console.log('result:', result);
+        if(typeof(result) === 'undefined'){
+            console.log('undefined data')
+        }else if(result.length === 0){
+            console.log('empty')
+        }else if(result[0]['type'] === 'topk') {
+            console.log('caught topk!!!!!!!!!!')
+            names_topk = [];  
+            nums_topk = []; 
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                names_topk.push(result[0]["data"][i]["name"]); 
             }
-            for (var i = 0; i < result["data"].length; i++) {
-                nums.push(result["data"][i]["num"]); 
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                nums_topk.push(result[0]["data"][i]["num"]); 
             }
             myChart_1.hideLoading(); 
             myChart_1.setOption({  
@@ -95,97 +111,45 @@ var getting = {
                     text: 'top K'
                 },
                 xAxis: {
-                    data: names
+                    data: names_topk
                 },
                 series: [{
                     name: 'nums',
-                    data: nums
+                    data: nums_topk
                 }]
             });
-        }
-
-    },
-    error: function(errorMsg) {
-        console.log("request failed!");
-        myChart_1.hideLoading();
-    }
-}
-window.setInterval(function() {
-    $.ajax(getting)
-}, 1000);
-
-
-
-
-
-
-
-
-
-
-var getting_2 = {
-    type: "get",
-    url: "http://127.0.0.1:5000/echarts-1",  
-    dataType: "json", 
-    success: function(result) {
-        if (result["type"] === 'devx') {
-            var names = [];  
-            var nums = [];   
-            for (var i = 0; i < result["data"].length; i++) {
-                names.push(result["data"][i]["name"]);  
+        }else if(result[0]['type'] === 'devx') {
+            console.log('caught devx!!!!!!!!!!')
+            names_devx = [];  
+            nums_devx = []; 
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                names_devx.push(result[0]["data"][i]["name"]); 
             }
-            for (var i = 0; i < result["data"].length; i++) {
-                nums.push(result["data"][i]["num"]);  
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                nums_devx.push(result[0]["data"][i]["num"]); 
             }
-            myChart_2.hideLoading();  
-            myChart_2.setOption({ 
+            myChart_2.hideLoading(); 
+            myChart_2.setOption({  
                 title: {
                     text: 'devx'
                 },
                 xAxis: {
-                    data: names
+                    data: names_devx
                 },
                 series: [{
                     name: 'nums',
-                    data: nums
+                    data: nums_devx
                 }]
             });
-        }
-
-    },
-    error: function(errorMsg) {
-        console.log("request failed!");
-        myChart_2.hideLoading();
-    }
-}
-window.setInterval(function() {
-    $.ajax(getting_2)
-}, 1000);
-
-
-
-
-
-
-
-
-
-
-
-
-var getting_3 = {
-    type: "get",
-    url: "http://127.0.0.1:5000/echarts-1",  
-    dataType: "json",  
-    success: function(result) {
-        if (result["type"] === 'bandh') {
-            var names = []; 
-            var nums = [];   
-            for (var i = 0; i < result["data"].length; i++) {
-                names.push(result["data"][i]["name"]);   
+        }else if(result[0]['type'] === 'bandh') {
+            console.log('caught bandh!!!!!!!!!!')
+            names_bandh = [];  
+            nums_bandh = []; 
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                names_bandh.push(result[0]["data"][i]["name"]); 
             }
-            for (var i = 0; i < result["data"].length; i++) {
-                nums.push(result["data"][i]["num"]);  
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                nums_bandh.push(result[0]["data"][i]["num"]); 
             }
             myChart_3.hideLoading(); 
             myChart_3.setOption({  
@@ -193,21 +157,30 @@ var getting_3 = {
                     text: 'bandh'
                 },
                 xAxis: {
-                    data: names
+                    data: names_bandh
                 },
                 series: [{
                     name: 'nums',
-                    data: nums
+                    data: nums_bandh
                 }]
             });
         }
 
     },
     error: function(errorMsg) {
-        console.log("request failed!");
-        myChart_3.hideLoading();
+        console.log("request fail", 10);
+        myChart_1.hideLoading();
     }
 }
 window.setInterval(function() {
-    $.ajax(getting_3)
-}, 1000);
+    $.ajax(getting)
+}, 500);
+
+
+
+
+
+
+
+
+
