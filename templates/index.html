@@ -18,13 +18,15 @@
         Protocols:<br><input type="text" name="pro"><br> Protocols fraction:<br><input type="text" name="pro_frac"><br>
         IPs:<br><input type="text" name="ips"><br>
         IPs fraction:<br><input type="text" name="ip_frac"><br>
+        Packet size:<br><input type="text" name="pack_size"><br>
+        Packet_size fraction:<br><input type="text" name="pack_size_frac"><br>
         Bandwidth:<br><input type="text" name="bandwidth"><br>
         <input type="submit" value="input_submit" name="action"><br>
         <h3>Query Configuration</h3>
         <input type="radio" name="query_type" value="IP"> IP<br>
         <input type="radio" name="query_type" value="Protocol"> Protocol<br> Query detail:<br> Top-K:
         <br>
-        <input type="text" name="topK"><br> DevX/times:
+        <input type="text" name="topk"><br> DevX/times:
         <br>
         <input type="text" name="devx"><br> BandwidthH/%:
         <br>
@@ -32,7 +34,7 @@
         <input type="text" name="time_unit"><br>
         <button type="submit" value="query_submit" name="action" onclick="appr()">Submit Query </button>
         <br>
-        <h3> Queues:</h3>
+        <h3> Queries:</h3>
         <select name="exist_queries">
           <option value="-1" SELECTED> CHOOSE </option>
           {% for o in option_list %}
@@ -63,8 +65,8 @@
   }
 </script>
 
-<!-- <script type="text/javascript" src="../js/chart-1.js"></script>
- -->
+<script type="text/javascript" src="../js/chart-1.js"></script>
+
 
 
 </html>

@@ -3,7 +3,7 @@ from pyspark.streaming import StreamingContext
 import threading, os, sys
 import math
 import thread
-import time
+import time, random
 import multiprocessing, signal
 
 
@@ -54,7 +54,6 @@ class ques(object):
         type(self).my_queries = {}
 
 
-
     def delete_query(self, idx):
         print "delete_query:", idx
         type(self).my_queries[idx].proc.terminate()
@@ -84,6 +83,7 @@ class ques(object):
         qid = self.geneQid()
         print "add idx:", qid
         type(self).my_queries[qid] = new_query
+        new_query.optid = qid
 
 class inputStr(object):
     def __init__(self):
@@ -92,14 +92,21 @@ class inputStr(object):
         self.pro = ''
         self.pro_frac = ''
         self.bandwidth = ''
+        self.pack_size = ''
+        self.pack_size_frac = ''
 
     def data_clean(self):
         def split_line(line):
             return map(float, line.split())
         if(self.ip_frac):
             self.ip_frac = split_line(self.ip_frac)
+            self.ips = self.ips.split()
         if(self.pro_frac):
             self.pro_frac = split_line(self.pro_frac)
+            self.pro = self.pro.split()
+        if(self.pack_size):
+            self.pack_size = split_line(self.pack_size)
+            self.pack_size_frac = split_line(self.pack_size_frac)
         if self.bandwidth:
             self.bandwidth = float(self.bandwidth)
 
@@ -110,6 +117,8 @@ class inputStr(object):
         print(self.pro)
         print(self.pro_frac)
         print(self.bandwidth)
+        print(self.pack_size)
+        print(self.pack_size_frac)
 
 class dataStr(object):
     my_input_str = {}
@@ -164,7 +173,7 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
             print("topk:", topk)
             chart_res_que.addRes(query_type, topk)
 
-
+    print "T in spark :",T
     conf = SparkConf().setAppName("zns").setMaster("local")
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
@@ -189,7 +198,6 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
 
 
 def parseQuery(new_queue):
-    print ('id:', new_queue.optid)
     if new_queue.content_type == 'IP':
         key_pos = 2
     else:

@@ -38,8 +38,12 @@ def my_form_post():
         if request.form['pro']:
             new_data_str.pro = request.form['pro']
             new_data_str.pro_frac = request.form['pro_frac']
+        if request.form['pack_size']:
+            new_data_str.pack_size = request.form['pack_size']
+            new_data_str.pack_size_frac = request.form['pack_size_frac']
         if request.form['bandwidth']:
             new_data_str.bandwidth = request.form['bandwidth']
+
         new_data_str.data_clean()
         new_data_str.print_out()
     else:
@@ -71,7 +75,6 @@ def my_form_post():
                 print "del_qid:", del_qid
                 if ZNSevaluator.queries.in_queries(del_qid):
                     ZNSevaluator.queries.delete_query(del_qid)
-    print 7
     return render_template('index.html', option_list=ZNSevaluator.queries.values())
 
 if __name__ == '__main__':
