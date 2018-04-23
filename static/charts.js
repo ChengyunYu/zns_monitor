@@ -2,7 +2,7 @@ var a = echarts;
 var myChart_1 = a.init(document.getElementById('chart-1'));
 var myChart_2 = a.init(document.getElementById('chart-2'));
 var myChart_3 = a.init(document.getElementById('chart-3'));  
-//var myChart_4 = a.init(document.getElementById('chart-4')); 
+var myChart_4 = a.init(document.getElementById('chart-4')); 
 
 var setJson = {
     title: {  
@@ -73,10 +73,12 @@ var setJson = {
 myChart_1.setOption(setJson);
 myChart_2.setOption(setJson);
 myChart_3.setOption(setJson);
+myChart_4.setOption(setJson);
 
 myChart_1.showLoading(); 
 myChart_2.showLoading();
 myChart_3.showLoading();   
+myChart_4.showLoading();   
 
 var names_topk = [];  
 var nums_topk = []; 
@@ -84,6 +86,10 @@ var names_devx = [];
 var nums_devx = []; 
 var names_bandh = [];  
 var nums_bandh = []; 
+var names_default_ip = [];  
+var nums_default_ip = []; 
+var names_default_pro = []; 
+var nums_default_pro = []; 
 
 var getting = {
     type: "get",
@@ -108,7 +114,7 @@ var getting = {
             myChart_1.hideLoading(); 
             myChart_1.setOption({  
                 title: {
-                    text: 'top K'
+                    text: 'Top K Query'
                 },
                 xAxis: {
                     data: names_topk
@@ -154,7 +160,7 @@ var getting = {
             myChart_3.hideLoading(); 
             myChart_3.setOption({  
                 title: {
-                    text: 'bandh'
+                    text: 'Bandwidth Query'
                 },
                 xAxis: {
                     data: names_bandh
@@ -162,6 +168,64 @@ var getting = {
                 series: [{
                     name: 'nums',
                     data: nums_bandh
+                }]
+            });
+        }else if(result[0]['type'] === 'default_ip') {
+            console.log('caught default_ip!!!!!!!!!!')
+            
+            names_default_ip = [];  
+            nums_default_ip = []; 
+
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                names_default_ip.push(result[0]["data"][i]["name"]); 
+            }
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                nums_default_ip.push(result[0]["data"][i]["num"]); 
+            }
+
+            var names_default = names_default_ip.concat(names_default_pro);
+            var nums_default = nums_default_ip.concat(nums_default_pro);
+
+            myChart_4.hideLoading(); 
+            myChart_4.setOption({  
+                title: {
+                    text: 'Monitor for Data Generator'
+                },
+                xAxis: {
+                    data: names_default
+                },
+                series: [{
+                    name: 'nums',
+                    data: nums_default
+                }]
+            });
+        }else if(result[0]['type'] === 'default_pro') {
+            console.log('caught default_pro!!!!!!!!!!')
+            
+            names_default_pro = [];  
+            nums_default_pro = []; 
+
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                names_default_pro.push(result[0]["data"][i]["name"]); 
+            }
+            for (var i = 0; i < result[0]["data"].length; i++) {
+                nums_default_pro.push(result[0]["data"][i]["num"]); 
+            }
+            
+            var names_default = names_default_ip.concat(names_default_pro);
+            var nums_default = nums_default_ip.concat(nums_default_pro);
+
+            myChart_4.hideLoading(); 
+            myChart_4.setOption({  
+                title: {
+                    text: 'Monitor for Data Generator'
+                },
+                xAxis: {
+                    data: names_default
+                },
+                series: [{
+                    name: 'nums',
+                    data: nums_default
                 }]
             });
         }
