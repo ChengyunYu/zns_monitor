@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# Created by Neng Chen
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 import threading, os, sys
@@ -6,7 +8,6 @@ import thread
 import time, random
 import multiprocessing, signal
 import numpy as np
-
 
 
 class query(object):
@@ -24,6 +25,7 @@ class query(object):
 class queRes(object):
     def __init__(self):
         self.que_res = multiprocessing.Queue()
+
 
     def addRes(self, query_type, k_v):
         new_res = {'type':query_type, 'data' : []}
@@ -138,10 +140,6 @@ class dataStr(object):
         new_query.idx = idx
 
 
-queries = ques()
-chart_res = queRes()
-data_str = dataStr()
-
 def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
     def standDevX(data):
         print ("in: ", query_no)
@@ -178,11 +176,11 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
         print ("in: ", query_no)
         key_val_cnt = data.filter(lambda x: x[1] > 0)
         if key_val_cnt.count():
-            topk = key_val_cnt.top(num, key=lambda x: x[1])
+            topk = key_val_cnt.top(int(num), key=lambda x: x[1])
             print("topk:", topk)
             chart_res_que.addRes(send_query_type[0], topk)
-    send_query_type =[query_type]
 
+    send_query_type =[query_type]
     conf = SparkConf().setAppName("zns").setMaster("local")
     sc = SparkContext(conf=conf)
     sc.setLogLevel("off")
@@ -193,7 +191,6 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
         (record[key_pos], float(record[value_pos])))
     processed_words = words.reduceByKeyAndWindow(lambda x, y: x+y, \
         lambda x, y: x-y, T, 1)
-    processed_words.pprint()
     if(query_type == 'devx'):
         processed_words.foreachRDD(standDevX)
     else:
@@ -204,6 +201,40 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
     ssc.start()
     ssc.awaitTermination()
 
+def always_on_stat(chart_res_que):
+    def __stat(data):
+        print("in default")
+        key_val_cnt = data.filter(lambda x: x[1] > 0)
+        if key_val_cnt.count():
+            total_vol = key_val_cnt.map(lambda x: x[1]).reduce(lambda x, y: x+y)
+            word_frac = key_val_cnt.map(lambda x: (x[0], x[1]/total_vol)).collect()
+            chart_res_que.addRes(my_argvs[0], word_frac)
+    conf = SparkConf().setAppName("zns_def").setMaster("local")
+    sc = SparkContext(conf=conf)
+    sc.setLogLevel("off")
+    ssc = StreamingContext(sc, 1)
+    ssc.checkpoint(r"../checkpoint0")
+    data = ssc.textFileStream(r"./Data")
+    tmp = data.map(lambda line: line.split(' '))
+    word_ip = tmp.map(lambda record:
+            (record[2], float(record[5]))).reduceByKeyAndWindow(lambda x, y: x+y, \
+            lambda x, y: x-y, 10, 2)
+    word_pro = tmp.map(lambda record:
+            (record[4], float(record[5]))).reduceByKeyAndWindow(lambda x, y: x+y, \
+            lambda x, y: x-y, 10, 2)
+    my_argvs = ['default_ip']
+    word_ip.foreachRDD(__stat)
+    my_argvs = ['default_pro']
+    word_pro.foreachRDD(__stat)
+    ssc.start()
+    ssc.awaitTermination()
+
+queries = ques()
+chart_res = queRes()
+data_str = dataStr()
+def_proc = multiprocessing.Process(target=always_on_stat, args=(chart_res,))
+def_proc.start()
+
 
 def parseQuery(new_queue):
     if new_queue.content_type == 'IP':
@@ -213,6 +244,6 @@ def parseQuery(new_queue):
             key_pos = 4
     value_pos = 5
     print "type:", new_queue.query_type
-    new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, int(new_queue.num), int(new_queue.T), new_queue.optid, new_queue.query_type, chart_res))
+    new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, float(new_queue.num), float(new_queue.T), new_queue.optid, new_queue.query_type, chart_res))
     queries.add_proc(new_queue.optid, new_proc)
     new_proc.start()
