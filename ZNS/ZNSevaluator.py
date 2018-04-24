@@ -26,7 +26,6 @@ class queRes(object):
     def __init__(self):
         self.que_res = multiprocessing.Queue()
 
-
     def addRes(self, query_type, k_v):
         new_res = {'type':query_type, 'data' : []}
         if not k_v:
@@ -148,11 +147,11 @@ def newProcess(key_pos, value_pos, num, T, query_no, query_type, chart_res_que):
             total_cnt = key_val_cnt.count()
             total_val = key_val_cnt.map(lambda x: x[1]).reduce(lambda x, y: x+y)
             averg = total_val/total_cnt
-            print("total cnt:", total_cnt)
-            print("total:", key_val_cnt.collect())
-            print("average:", averg)
             dev = math.sqrt(key_val_cnt.map(lambda x: (x[1] - averg)**2).reduce(lambda x, y: x+y)/total_cnt)
-            print("dev:", dev)
+            # print("total cnt:", total_cnt)
+            # print("total:", key_val_cnt.collect())
+            # print("average:", averg)
+            # print("dev:", dev)
             if dev:
                 devFromAverg = key_val_cnt.map(lambda x: (x[0], x[1], abs(x[1] - averg)/dev))
                 devH = devFromAverg.filter(lambda x: x[2] > num)
@@ -229,12 +228,6 @@ def always_on_stat(chart_res_que):
     ssc.start()
     ssc.awaitTermination()
 
-queries = ques()
-chart_res = queRes()
-data_str = dataStr()
-def_proc = multiprocessing.Process(target=always_on_stat, args=(chart_res,))
-def_proc.start()
-
 
 def parseQuery(new_queue):
     if new_queue.content_type == 'IP':
@@ -247,3 +240,12 @@ def parseQuery(new_queue):
     new_proc = multiprocessing.Process(target=newProcess, args=(key_pos, value_pos, float(new_queue.num), float(new_queue.T), new_queue.optid, new_queue.query_type, chart_res))
     queries.add_proc(new_queue.optid, new_proc)
     new_proc.start()
+
+queries = ques()
+chart_res = queRes()
+data_str = dataStr()
+def my_init():
+    print "hi init"
+    def_proc = multiprocessing.Process(target=always_on_stat, args=(chart_res,))
+    def_proc.start()
+
